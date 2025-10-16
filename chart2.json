@@ -1,0 +1,156 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 900,
+  "height": 600,
+  "title": "Australia — Total Forest Burnt Area by State (2016–21, '000 ha)",
+  "projection": {"type": "mercator"},
+  "hconcat": [
+    {
+      "layer": [
+        {
+          "name": "country-base",
+          "data": {
+            "url": "https://gist.githubusercontent.com/qhoa0005/2f1de9bb126e7384b964aa5cc706e1e8/raw/7f703135c469065a8db915956102078721098a83/AustraliaMap.csv",
+            "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+          },
+          "transform": [
+            {"filter": "datum.properties && (datum.properties.ADMIN === 'Australia' || datum.properties.NAME === 'Australia')"}
+          ],
+          "mark": {"type": "geoshape", "fill": "#f3f3f3", "stroke": "#bbb", "strokeWidth": 0.5}
+        },
+        {
+          "name": "state-choropleth",
+          "data": {
+            "url": "https://raw.githubusercontent.com/tonywr71/GeoJson-Data/master/australian-states.json",
+            "format": {"type": "json", "property": "features"}
+          },
+          "transform": [
+            {"calculate": "datum.properties.STATE_NAME", "as": "STATE_NAME"},
+            {
+              "calculate": "datum.STATE_NAME === 'New South Wales' ? 'NSW' : datum.STATE_NAME === 'Victoria' ? 'Vic' : datum.STATE_NAME === 'Queensland' ? 'Qld' : datum.STATE_NAME === 'South Australia' ? 'SA' : datum.STATE_NAME === 'Western Australia' ? 'WA' : datum.STATE_NAME === 'Tasmania' ? 'Tas' : datum.STATE_NAME === 'Northern Territory' ? 'NT' : datum.STATE_NAME === 'Australian Capital Territory' ? 'ACT' : null",
+              "as": "abbr"
+            },
+            {
+              "lookup": "abbr",
+              "from": {
+                "data": {
+                  "url": "https://gist.githubusercontent.com/qhoa0005/272096528499bb93188e1cbf64c72e9e/raw/457b13537fbd8256b62757778ae1c5e73e7a923d/forest_fire_area_by_jurisdiction_2011_2021.csv",
+                  "format": {"type": "csv"}
+                },
+                "key": "Jurisdiction",
+                "fields": [
+                  "Total_2016_21",
+                  "Planned_fire_2016_21",
+                  "Unplanned_fire_2016_21",
+                  "Total_2011_15"
+                ]
+              }
+            }
+          ],
+          "mark": {"type": "geoshape"},
+          "encoding": {
+            "color": {
+              "field": "Total_2016_21",
+              "type": "quantitative",
+              "title": "Total burnt (2016–21, '000 ha)",
+              "scale": {"scheme": "reds"}
+            },
+            "tooltip": [
+              {"field": "STATE_NAME", "title": "State"},
+              {"field": "Total_2016_21", "title": "Total 2016–21 ('000 ha)", "format": ","},
+              {"field": "Planned_fire_2016_21", "title": "Planned 2016–21", "format": ","},
+              {"field": "Unplanned_fire_2016_21", "title": "Unplanned 2016–21", "format": ","},
+              {"field": "Total_2011_15", "title": "Total 2011–15", "format": ","}
+            ]
+          }
+        },
+        {
+          "name": "fire-points",
+          "data": {
+            "values": [
+              {"abbr": "NSW", "lon": 147.0, "lat": -32.0},
+              {"abbr": "Vic", "lon": 144.0, "lat": -37.0},
+              {"abbr": "Qld", "lon": 143.0, "lat": -20.0},
+              {"abbr": "SA",  "lon": 135.5, "lat": -30.0},
+              {"abbr": "WA",  "lon": 122.0, "lat": -25.0},
+              {"abbr": "Tas", "lon": 147.0, "lat": -42.0},
+              {"abbr": "NT",  "lon": 133.0, "lat": -19.0},
+              {"abbr": "ACT", "lon": 149.0, "lat": -35.3}
+            ]
+          },
+          "transform": [
+            {
+              "lookup": "abbr",
+              "from": {
+                "data": {
+                  "url": "https://gist.githubusercontent.com/qhoa0005/272096528499bb93188e1cbf64c72e9e/raw/457b13537fbd8256b62757778ae1c5e73e7a923d/forest_fire_area_by_jurisdiction_2011_2021.csv",
+                  "format": {"type": "csv"}
+                },
+                "key": "Jurisdiction",
+                "fields": ["Total_2016_21"]
+              }
+            }
+          ],
+          "mark": {"type": "circle", "opacity": 0.8, "stroke": "white", "strokeWidth": 1},
+          "encoding": {
+            "longitude": {"field": "lon"},
+            "latitude": {"field": "lat"},
+            "size": {"field": "Total_2016_21", "type": "quantitative", "scale": {"range": [50, 2000]}},
+            "color": {"value": "#2c3e50"},
+            "tooltip": [
+              {"field": "abbr", "title": "State"},
+              {"field": "Total_2016_21", "title": "Total 2016–21 ('000 ha)", "format": ","}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "legend-bars",
+      "width": 260,
+      "data": {
+        "url": "https://gist.githubusercontent.com/qhoa0005/272096528499bb93188e1cbf64c72e9e/raw/457b13537fbd8256b62757778ae1c5e73e7a923d/forest_fire_area_by_jurisdiction_2011_2021.csv",
+        "format": {"type": "csv"}
+      },
+      "transform": [
+        {"filter": "datum.Jurisdiction != 'Australia'"}
+      ],
+      "layer": [
+        {
+          "mark": {"type": "bar"},
+          "encoding": {
+            "y": {
+              "field": "Jurisdiction",
+              "type": "ordinal",
+              "sort": {"field": "Total_2016_21", "order": "descending"},
+              "title": "State"
+            },
+            "x": {
+              "field": "Total_2016_21",
+              "type": "quantitative",
+              "title": "Total 2016–21 ('000 ha)"
+            },
+            "color": {
+              "field": "Total_2016_21",
+              "type": "quantitative",
+              "scale": {"scheme": "reds"},
+              "legend": null
+            }
+          }
+        },
+        {
+          "mark": {"type": "text", "align": "left", "dx": 3, "baseline": "middle"},
+          "encoding": {
+            "y": {
+              "field": "Jurisdiction",
+              "type": "ordinal",
+              "sort": {"field": "Total_2016_21", "order": "descending"}
+            },
+            "x": {"field": "Total_2016_21", "type": "quantitative"},
+            "text": {"field": "Total_2016_21", "type": "quantitative", "format": ","}
+          }
+        }
+      ]
+    }
+  ]
+}

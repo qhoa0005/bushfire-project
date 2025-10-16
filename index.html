@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Australia Bushfire Visualization Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      text-align: center;
+      margin: 30px 0;
+    }
+    .chart-container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .chart {
+      margin-bottom: 40px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Australia Bushfire Data Visualization Dashboard</h1>
+
+  <div class="chart-container">
+    <h2>Choropleth</h2>
+    <div id="chart1" class="chart"></div>
+    <h2>bar</h2>
+    <div id="chart2" class="chart"></div>
+
+     </div>
+
+  <script>
+    // Biểu đồ 1 – Choropleth map
+    vegaEmbed('#chart1', 'chart1.json');
+
+    // // Biểu đồ 2 – Bar chart
+     vegaEmbed('#chart2', 'chart2.json');
+
+    // // Biểu đồ 3 – Pie chart nguyên nhân
+    // vegaEmbed('#chart3', 'chart3.json');
+
+    // // Biểu đồ 4 – Line chart theo tháng
+    // vegaEmbed('#chart4', 'chart4.json');
+
+    // // Biểu đồ 5 – Map điểm cháy
+    // vegaEmbed('#chart5', 'chart5.json');
+  </script>
+</body>
+</html>
